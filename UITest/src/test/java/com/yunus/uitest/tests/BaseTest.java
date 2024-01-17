@@ -6,6 +6,7 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -28,21 +29,36 @@ public class BaseTest {
     @After
     public void tearDown(Scenario scenario) {
         takeScreenshot(scenario);
-        driver.quit();
+        closeDriver();
     }
 
     void configureDriver() {
-        if (Config.selectedDriver.equals("chrome")) {
-            System.setProperty("webdriver.chrome.driver", Config.chromeDriverPath);
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--disable-extensions");
-            options.addArguments("--disable-plugins-discovery");
-            options.addArguments("--incognito");
-            options.addArguments("--disable-popup-blocking");
-            options.addArguments("--start-maximized");
-            driver = new ChromeDriver(options);
-            driver.manage().deleteAllCookies();
-            driver.get(Config.baseURL);
+        try {
+            if (Config.selectedDriver.equals("chrome")) {
+                System.setProperty("webdriver.chrome.driver", Config.chromeDriverPath);
+                ChromeOptions options = new ChromeOptions();
+                options.addArguments("--disable-extensions");
+                options.addArguments("--disable-plugins-discovery");
+                options.addArguments("--incognito");
+                options.addArguments("--disable-popup-blocking");
+                options.addArguments("--start-maximized");
+                driver = new ChromeDriver(options);
+                driver.manage().deleteAllCookies();
+                driver.get(Config.baseURL);
+            }
+        }catch (Exception e) {
+            //e.printStackTrace();
+            System.out.println("Driver could not be configured!");
+        }
+    }
+    private void closeDriver() {
+        try {
+            if (driver != null) {
+                driver.quit();
+            }
+        } catch (Exception e) {
+           // e.printStackTrace("Failed to close driver!");
+            System.out.println("Failed to close driver!");
         }
     }
 
@@ -54,7 +70,7 @@ public class BaseTest {
             try {
                 FileUtils.copyFile(scrFile, screenShotName);
             } catch (IOException e) {
-                System.out.println();
+                System.out.println("Screenshot could not be taken!");
             }
         }
     }

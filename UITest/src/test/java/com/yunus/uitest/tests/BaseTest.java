@@ -54,7 +54,7 @@ public class BaseTest {
             try {
                 FileUtils.copyFile(scrFile, screenShotName);
             } catch (IOException e) {
-                System.out.println(e);
+                System.out.println();
             }
         }
     }

@@ -5,6 +5,7 @@ import java.time.Duration;
 public final class Config {
     public static String baseURL = "https://www.trendyol.com/";
     public static String chromeDriverPath = "src/test/resources/drivers/chromedriver.exe";
+    public static String edgeDriverPath = "src/test/resources/drivers/msedgedriver.exe";
     public static String selectedDriver = "chrome";
     public static Duration DEFAULT_WAIT = Duration.ofSeconds(10);
     public static String validEmail = "validusermailadress@gmail.com";

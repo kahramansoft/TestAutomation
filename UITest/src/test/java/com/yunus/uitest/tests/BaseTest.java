@@ -6,12 +6,13 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,9 @@ public class BaseTest {
 
     @After
     public void tearDown(Scenario scenario) {
-        takeScreenshot(scenario);
+        if (scenario.isFailed()) {
+            takeScreenshot(scenario);
+        }
         closeDriver();
     }
 
@@ -44,13 +47,24 @@ public class BaseTest {
                 options.addArguments("--start-maximized");
                 driver = new ChromeDriver(options);
                 driver.manage().deleteAllCookies();
-                driver.get(Config.baseURL);
+            } else if (Config.selectedDriver.equals("edge")) {
+                System.setProperty("webdriver.edge.driver", Config.edgeDriverPath);
+                EdgeOptions options = new EdgeOptions();
+                options.addArguments("--disable-extensions");
+                options.addArguments("--disable-plugins-discovery");
+                options.addArguments("--incognito");
+                options.addArguments("--disable-popup-blocking");
+                options.addArguments("--start-maximized");
+                driver = new EdgeDriver(options);
+                driver.manage().deleteAllCookies();
+            } else {
+                System.out.println("Invalid driver selection: " + Config.selectedDriver);
             }
-        }catch (Exception e) {
-            //e.printStackTrace();
+        } catch (Exception e) {
             System.out.println("Driver could not be configured!");
         }
     }
+
     private void closeDriver() {
         try {
             if (driver != null) {
@@ -63,8 +77,8 @@ public class BaseTest {
     }
 
     void takeScreenshot(Scenario scenario) {
-        if (scenario.isFailed()) {
             File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
             File screenShotName = new File("src/test/resources/screenshots/" + scenario.getName() + "_" + timeStamp + ".png");
             try {
@@ -74,4 +88,4 @@ public class BaseTest {
             }
         }
     }
-}
+

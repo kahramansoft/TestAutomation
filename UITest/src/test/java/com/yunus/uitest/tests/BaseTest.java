@@ -5,7 +5,9 @@ import com.yunus.uitest.util.Config;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -13,6 +15,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.opera.OperaDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +25,8 @@ import java.util.Calendar;
 
 public class BaseTest {
     public static WebDriver driver;
+    static String browser = System.getProperty("browser");
+
 
     @Before
     public void beforeTest() {
@@ -37,7 +43,8 @@ public class BaseTest {
 
     void configureDriver() {
         try {
-            if (Config.selectedDriver.equals("chrome")) {
+            if((browser==null)){
+                if(Config.selectedDriver.equals("chrome")){
                 System.setProperty("webdriver.chrome.driver", Config.chromeDriverPath);
                 ChromeOptions options = new ChromeOptions();
                 options.addArguments("--disable-extensions");
@@ -49,17 +56,30 @@ public class BaseTest {
                 driver.manage().deleteAllCookies();
             } else if (Config.selectedDriver.equals("edge")) {
                 System.setProperty("webdriver.edge.driver", Config.edgeDriverPath);
-                EdgeOptions options = new EdgeOptions();
+                driver = new EdgeDriver();
+                driver.manage().window().maximize();
+                driver.manage().deleteAllCookies();
+            } else {
+                System.out.println("Invalid driver selection: " + Config.selectedDriver);
+            }
+        }
+            else if (browser.equals("chrome")) {
+                System.setProperty("webdriver.chrome.driver", Config.chromeDriverPath);
+                ChromeOptions options = new ChromeOptions();
                 options.addArguments("--disable-extensions");
                 options.addArguments("--disable-plugins-discovery");
                 options.addArguments("--incognito");
                 options.addArguments("--disable-popup-blocking");
                 options.addArguments("--start-maximized");
-                driver = new EdgeDriver(options);
+                driver = new ChromeDriver(options);
                 driver.manage().deleteAllCookies();
-            } else {
-                System.out.println("Invalid driver selection: " + Config.selectedDriver);
             }
+              else  if (browser.equals("edge")) {
+                WebDriverManager.edgedriver().setup();
+                driver = new EdgeDriver();
+                driver.manage().deleteAllCookies();
+                driver.manage().window().maximize();
+                }
         } catch (Exception e) {
             System.out.println("Driver could not be configured!");
         }

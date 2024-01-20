@@ -15,7 +15,7 @@ public class BasePage {
     private final WebDriver driver = BaseTest.driver;
 
     public void click(By selector) {
-        WebDriverWait wait = new WebDriverWait(driver, Config.DEFAULT_WAIT);
+        WebDriverWait wait = new WebDriverWait(driver, Config.DEFAULT_WAIT.toMillis());
         wait.until(ExpectedConditions.elementToBeClickable(selector)).click();
     }
 
@@ -52,7 +52,7 @@ public class BasePage {
     }
 
     public WebElement waitElementVisible(By selector) {
-        WebDriverWait wait = new WebDriverWait(driver, Config.DEFAULT_WAIT);
+        WebDriverWait wait = new WebDriverWait(driver, Config.DEFAULT_WAIT.toMillis());
         return wait.until(ExpectedConditions.visibilityOfElementLocated(selector));
     }
 

@@ -1,22 +1,20 @@
 package com.yunus.uitest.tests;
 
 
+import com.aventstack.extentreports.ExtentTest;
 import com.yunus.uitest.util.Config;
+import com.yunus.uitest.util.ExtentReportUtil;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FileUtils;
-import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.edge.EdgeOptions;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.opera.OperaDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +24,25 @@ import java.util.Calendar;
 public class BaseTest {
     public static WebDriver driver;
     static String browser = System.getProperty("browser");
+    private ExtentTest test;
+
+    private static boolean isExtentReportSetUp = false;
+
+    private int[] array;
+    private static int counter = 0;
 
 
     @Before
     public void beforeTest() {
         configureDriver();
+       //ExtentReportUtil.setUp();
+        if (!isExtentReportSetUp) {
+            ExtentReportUtil.setUp();
+            isExtentReportSetUp = true;
+        }
+        counter++;
+        test = ExtentReportUtil.startTest("Scenario " + counter, "Extent report oluşturuldu.");
+
     }
 
     @After
@@ -38,6 +50,8 @@ public class BaseTest {
         if (scenario.isFailed()) {
             takeScreenshot(scenario);
         }
+        ExtentReportUtil.endTest();
+
         closeDriver();
     }
 
